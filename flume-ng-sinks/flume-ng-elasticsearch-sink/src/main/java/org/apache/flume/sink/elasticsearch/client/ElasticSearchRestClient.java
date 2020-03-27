@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.HTTP_CLIENT;
 import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.HTTP_CLIENT_PREFIX;
 import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.DEFAULT_HTTP_CLIENT_CLASS;
+import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.ID_HEADER_NAME;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +56,7 @@ public class  ElasticSearchRestClient implements ElasticSearchClient {
   private static final String INDEX_OPERATION_NAME = "index";
   private static final String INDEX_PARAM = "_index";
   private static final String TYPE_PARAM = "_type";
+  private static final String ID_PARAM = "_id";
   private static final String TTL_PARAM = "_ttl";
   private static final String BULK_ENDPOINT = "_bulk";
 
@@ -68,6 +70,8 @@ public class  ElasticSearchRestClient implements ElasticSearchClient {
   private Context httpClientContext;
   private HttpClientBuilder httpClientBuilder;
   private HttpClient httpClient;
+
+  private String idHeaderName = null;
   
   public ElasticSearchRestClient(String[] hostNames,
       ElasticSearchEventSerializer serializer) {
@@ -92,6 +96,10 @@ public class  ElasticSearchRestClient implements ElasticSearchClient {
 
   @Override
   public void configure(Context context) {
+
+    if (StringUtils.isNotBlank(context.getString(ID_HEADER_NAME))) {
+      idHeaderName = context.getString(ID_HEADER_NAME);
+    }
 
     String clientBuilderClazz = DEFAULT_HTTP_CLIENT_CLASS;
     if (StringUtils.isNotBlank(context.getString(HTTP_CLIENT))) {
@@ -132,10 +140,17 @@ public class  ElasticSearchRestClient implements ElasticSearchClient {
     BytesReference content = serializer.getContentBuilder(event).bytes();
     Map<String, Map<String, String>> parameters = new HashMap<String, Map<String, String>>();
     Map<String, String> indexParameters = new HashMap<String, String>();
+    Map<String, String> headers = event.getHeaders();
     indexParameters.put(INDEX_PARAM, indexNameBuilder.getIndexName(event));
     indexParameters.put(TYPE_PARAM, indexType);
     if (ttlMs > 0) {
       indexParameters.put(TTL_PARAM, Long.toString(ttlMs));
+    }
+    if (idHeaderName != null) {
+      String id = headers.get(idHeaderName);
+      if (id != null) {
+        indexParameters.put(ID_PARAM, id);
+      }
     }
     parameters.put(INDEX_OPERATION_NAME, indexParameters);
 

@@ -18,11 +18,13 @@
  */
 package org.apache.flume.sink.elasticsearch;
 
+import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.ID_HEADER_NAME;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.conf.ComponentConfiguration;
@@ -38,9 +40,13 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 public class ElasticSearchDynamicSerializer implements
     ElasticSearchEventSerializer {
 
+  private String idHeaderName = null;
+
   @Override
   public void configure(Context context) {
-    // NO-OP...
+    if (StringUtils.isNotBlank(context.getString(ID_HEADER_NAME))) {
+      idHeaderName = context.getString(ID_HEADER_NAME);
+    }
   }
 
   @Override
@@ -66,6 +72,9 @@ public class ElasticSearchDynamicSerializer implements
     Map<String, String> headers = event.getHeaders();
     for (Map.Entry<String,String> entry : headers.entrySet()) {
       String key = entry.getKey();
+      if (StringUtils.equals(key, idHeaderName)) {
+        continue;
+      }
       byte[] val = entry.getValue().getBytes(charset);
       ContentBuilderUtil.appendField(builder, key, val);
     }

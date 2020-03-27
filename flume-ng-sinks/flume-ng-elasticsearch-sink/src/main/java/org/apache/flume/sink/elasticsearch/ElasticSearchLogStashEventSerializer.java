@@ -18,6 +18,7 @@
  */
 package org.apache.flume.sink.elasticsearch;
 
+import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.ID_HEADER_NAME;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
@@ -72,6 +73,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
  */
 public class ElasticSearchLogStashEventSerializer implements
     ElasticSearchEventSerializer {
+
+  private String idHeaderName = null;
 
   @Override
   public XContentBuilder getContentBuilder(Event event) throws IOException {
@@ -128,6 +131,9 @@ public class ElasticSearchLogStashEventSerializer implements
     builder.startObject("@fields");
     for (Map.Entry<String,String> entry : headers.entrySet()) {
       String key = entry.getKey();
+      if (StringUtils.equals(key, idHeaderName)) {
+        continue;
+      }
       byte[] val = entry.getValue().getBytes(charset);
       ContentBuilderUtil.appendField(builder, key, val);
     }
@@ -136,7 +142,9 @@ public class ElasticSearchLogStashEventSerializer implements
 
   @Override
   public void configure(Context context) {
-    // NO-OP...
+    if (StringUtils.isNotBlank(context.getString(ID_HEADER_NAME))) {
+      idHeaderName = context.getString(ID_HEADER_NAME);
+    }
   }
 
   @Override
