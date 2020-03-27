@@ -409,15 +409,18 @@ public class TestElasticSearchSink extends AbstractElasticSearchSinkTest {
     parameters.put(SERIALIZER, "java.lang.String");
     try {
       Configurables.configure(fixture, new Context(parameters));
-    } catch (ClassCastException e) {
+    } catch (RuntimeException e) {
       // expected
+      assertTrue(e.getCause() instanceof ClassCastException);
     }
 
     parameters.put(SERIALIZER, FakeConfigurable.class.getName());
     try {
       Configurables.configure(fixture, new Context(parameters));
-    } catch (IllegalArgumentException e) {
+    } catch (RuntimeException e) {
       // expected
+      assertEquals(e.getMessage(), "Could not instantiate event serializer.");
+      assertTrue(e.getCause() instanceof IllegalArgumentException);
     }
   }
 

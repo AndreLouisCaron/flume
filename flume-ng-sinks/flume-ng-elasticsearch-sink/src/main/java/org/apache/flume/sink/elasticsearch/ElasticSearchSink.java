@@ -31,6 +31,7 @@ import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.SER
 import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.SERIALIZER_PREFIX;
 import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.TTL;
 import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.TTL_REGEX;
+import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.TRANSPORT_CLIENT;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flume.Channel;
 import org.apache.flume.Context;
@@ -307,7 +308,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
       }
     } catch (Exception e) {
       logger.error("Could not instantiate event serializer.", e);
-      Throwables.propagate(e);
+      throw new RuntimeException("Could not instantiate event serializer.", e);
     }
 
     if (sinkCounter == null) {
@@ -333,18 +334,15 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
       indexNameBuilder.configure(indexnameBuilderContext);
     } catch (Exception e) {
       logger.error("Could not instantiate index name builder.", e);
-      Throwables.propagate(e);
-    }
-
-    if (sinkCounter == null) {
-      sinkCounter = new SinkCounter(getName());
+      throw new RuntimeException("Could not instantiate index name builder.", e);
     }
 
     Preconditions.checkState(StringUtils.isNotBlank(indexName),
         "Missing Param:" + INDEX_NAME);
     Preconditions.checkState(StringUtils.isNotBlank(indexType),
         "Missing Param:" + INDEX_TYPE);
-    Preconditions.checkState(StringUtils.isNotBlank(clusterName),
+    Preconditions.checkState(
+        StringUtils.equals(clientType, TRANSPORT_CLIENT) && StringUtils.isNotBlank(clusterName),
         "Missing Param:" + CLUSTER_NAME);
     Preconditions.checkState(batchSize >= 1, BATCH_SIZE
         + " must be greater than 0");
@@ -419,7 +417,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
       } else if (matcher.group(2).equals("d")) {
         return TimeUnit.DAYS.toMillis(Integer.parseInt(matcher.group(1)));
       } else if (matcher.group(2).equals("w")) {
-        return TimeUnit.DAYS.toMillis(7 * Integer.parseInt(matcher.group(1)));
+        return TimeUnit.DAYS.toMillis(7L * (long)Integer.parseInt(matcher.group(1)));
       } else if (matcher.group(2).equals("")) {
         logger.info("TTL qualifier is empty. Defaulting to day qualifier.");
         return TimeUnit.DAYS.toMillis(Integer.parseInt(matcher.group(1)));

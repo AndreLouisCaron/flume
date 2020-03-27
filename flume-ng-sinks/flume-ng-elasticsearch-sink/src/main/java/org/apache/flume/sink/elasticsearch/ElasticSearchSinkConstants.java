@@ -70,6 +70,11 @@ public class ElasticSearchSinkConstants {
   public static final String SERIALIZER_PREFIX = SERIALIZER + ".";
 
   /**
+   * Name of the header that will be used as the ElasticSearch document ID.
+   */
+  public static final String ID_HEADER_NAME = "idHeaderName";
+
+  /**
    * The fully qualified class name of the index name builder the sink
    * should use to determine name of index where the event should be sent.
    */
@@ -86,6 +91,16 @@ public class ElasticSearchSinkConstants {
    * The client type used for sending bulks to ElasticSearch
    */
   public static final String CLIENT_TYPE = "client";
+
+  /**
+   * Value to use with CLIENT_TYPE to get the transport client.
+   */
+  public static final String TRANSPORT_CLIENT = "transport";
+
+  /**
+   * Value to use with CLIENT_TYPE to get the REST client.
+   */
+  public static final String REST_CLIENT = "rest";
 
   /**
    * The client prefix to extract the configuration that will be passed to

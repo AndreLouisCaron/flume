@@ -20,14 +20,16 @@ package org.apache.flume.sink.elasticsearch.client;
 
 import org.apache.flume.sink.elasticsearch.ElasticSearchEventSerializer;
 import org.apache.flume.sink.elasticsearch.ElasticSearchIndexRequestBuilderFactory;
+import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.TRANSPORT_CLIENT;
+import static org.apache.flume.sink.elasticsearch.ElasticSearchSinkConstants.REST_CLIENT;
 
 /**
  * Internal ElasticSearch client factory. Responsible for creating instance
  * of ElasticSearch clients.
  */
 public class ElasticSearchClientFactory {
-  public static final String TransportClient = "transport";
-  public static final String RestClient = "rest";
+  public static final String TransportClient = TRANSPORT_CLIENT;
+  public static final String RestClient = REST_CLIENT;
 
   /**
    *
@@ -71,7 +73,6 @@ public class ElasticSearchClientFactory {
       return new ElasticSearchTransportClient(serializer);
     } else if (clientType.equalsIgnoreCase(TransportClient) && indexBuilder != null)  {
       return new ElasticSearchTransportClient(indexBuilder);
-    } else if (clientType.equalsIgnoreCase(RestClient)) {
     }
     throw new NoSuchClientTypeException();
   }

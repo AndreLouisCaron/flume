@@ -3028,27 +3028,29 @@ The type is the FQCN: org.apache.flume.sink.elasticsearch.ElasticSearchSink
 
 Required properties are in **bold**.
 
-================  ======================================================================== =======================================================================================================
-Property Name     Default                                                                  Description
-================  ======================================================================== =======================================================================================================
-**channel**       --
-**type**          --                                                                       The component type name, needs to be ``org.apache.flume.sink.elasticsearch.ElasticSearchSink``
-**hostNames**     --                                                                       Comma separated list of hostname:port, if the port is not present the default port '9300' will be used
-indexName         flume                                                                    The name of the index which the date will be appended to. Example 'flume' -> 'flume-yyyy-MM-dd'
-                                                                                           Arbitrary header substitution is supported, eg. %{header} replaces with value of named event header
-indexType         logs                                                                     The type to index the document to, defaults to 'log'
-                                                                                           Arbitrary header substitution is supported, eg. %{header} replaces with value of named event header
-clusterName       elasticsearch                                                            Name of the ElasticSearch cluster to connect to
-batchSize         100                                                                      Number of events to be written per txn.
-ttl               --                                                                       TTL in days, when set will cause the expired documents to be deleted automatically,
-                                                                                           if not set documents will never be automatically deleted. TTL is accepted both in the earlier form of
-                                                                                           integer only e.g. a1.sinks.k1.ttl = 5 and also with a qualifier ms (millisecond), s (second), m (minute),
-                                                                                           h (hour), d (day) and w (week). Example a1.sinks.k1.ttl = 5d will set TTL to 5 days. Follow
-                                                                                           http://www.elasticsearch.org/guide/reference/mapping/ttl-field/ for more information.
-serializer        org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer The ElasticSearchIndexRequestBuilderFactory or ElasticSearchEventSerializer to use. Implementations of
-                                                                                           either class are accepted but ElasticSearchIndexRequestBuilderFactory is preferred.
-serializer.*      --                                                                       Properties to be passed to the serializer.
-================  ======================================================================== =======================================================================================================
+=======================  ======================================================================== =======================================================================================================
+Property Name            Default                                                                  Description
+=======================  ======================================================================== =======================================================================================================
+**channel**              --
+**type**                 --                                                                       The component type name, needs to be ``org.apache.flume.sink.elasticsearch.ElasticSearchSink``
+**hostNames**            --                                                                       Comma separated list of hostname:port, if the port is not present the default port '9300' will be used
+indexName                flume                                                                    The name of the index which the date will be appended to. Example 'flume' -> 'flume-yyyy-MM-dd'
+                                                                                                  Arbitrary header substitution is supported, eg. %{header} replaces with value of named event header
+indexType                logs                                                                     The type to index the document to, defaults to 'log'
+                                                                                                  Arbitrary header substitution is supported, eg. %{header} replaces with value of named event header
+clusterName              elasticsearch                                                            Name of the ElasticSearch cluster to connect to
+batchSize                100                                                                      Number of events to be written per txn.
+ttl                      --                                                                       TTL in days, when set will cause the expired documents to be deleted automatically,
+                                                                                                  if not set documents will never be automatically deleted. TTL is accepted both in the earlier form of
+                                                                                                  integer only e.g. a1.sinks.k1.ttl = 5 and also with a qualifier ms (millisecond), s (second), m (minute),
+                                                                                                  h (hour), d (day) and w (week). Example a1.sinks.k1.ttl = 5d will set TTL to 5 days. Follow
+                                                                                                  http://www.elasticsearch.org/guide/reference/mapping/ttl-field/ for more information.
+serializer               org.apache.flume.sink.elasticsearch.ElasticSearchLogStashEventSerializer The ``ElasticSearchIndexRequestBuilderFactory`` or ``ElasticSearchEventSerializer`` to use.
+                                                                                                  Implementations of either class are accepted but ``ElasticSearchIndexRequestBuilderFactory`` is
+                                                                                                  preferred.
+serializer.*             --                                                                       Properties to be passed to the serializer.
+serializer.idHeaderName  --                                                                       Name of the header that will be used as the ElasticSearch document ID.
+=======================  ======================================================================== =======================================================================================================
 
 .. note:: Header substitution is a handy to use the value of an event header to dynamically decide the indexName and indexType to use when storing the event.
           Caution should be used in using this feature as the event submitter now has control of the indexName and indexType.
